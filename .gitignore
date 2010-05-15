@@ -1,0 +1,4 @@
+.*
+!.gitignore
+MooseX-Types-Meta-*
+Debian_CPANTS.txt
