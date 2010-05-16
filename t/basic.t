@@ -87,6 +87,7 @@ ok(Method->check($_)) for (
     (map { TestClass->meta->get_method($_) } qw(foo bar baz attr)),
     (map { TestRole->meta->get_method($_)  } qw(foo attr)),
     Moose::Meta::Class->meta->get_method('create'),
+    Moose::Meta::Class->meta->get_method('new'),
 );
 
 
