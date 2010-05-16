@@ -133,6 +133,14 @@ test StructuredTypeConstraint => sub {
     );
 };
 
+test StructuredTypeCoercion => sub {
+    my $tc = subtype as Dict[];
+    coerce $tc, from Undef, via { +{} };
+
+    ok(StructuredTypeCoercion->check($_)) for $tc->coercion;
+    ok(!StructuredTypeCoercion->check($_)) for $tc, Str, 42;
+};
+
 test 'MooseX::Role::Parameterized' => sub {
     plan skip_all => 'MooseX::Role::Parameterized required'
         unless eval { require MooseX::Role::Parameterized; 1 };
@@ -169,8 +177,6 @@ EOR
         );
     };
 };
-
-# StructuredTypeCoercion
 
 # TypeEquals
 # TypeOf
