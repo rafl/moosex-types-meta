@@ -2,7 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
-use MooseX::Types::Moose qw(Int);
+use Moose::Util::TypeConstraints;
+use MooseX::Types::Moose qw(Int Str);
 
 use MooseX::Types::Meta ':all';
 
@@ -97,6 +98,12 @@ ok(!Method->check($_)) for (
 
 
 # TypeCoercion
+my $tc = subtype as Int;
+coerce $tc, from Str, via { 0 + $_ };
+
+ok(TypeCoercion->check($_)) for $tc->coercion;
+ok(!TypeCoercion->check($_)) for $tc, Str, 42;
+
 # StructuredTypeConstraint
 # StructuredTypeCoercion
 # ParameterizableRole
