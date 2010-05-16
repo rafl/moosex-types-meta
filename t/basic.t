@@ -71,6 +71,17 @@ ok(!Attribute->check($_)) for (
 ok(!Attribute->check($_)) for TestClass->meta, \23;
 
 
+# RoleAttribute
+ok(RoleAttribute->check($_)) for (
+    TestRole->meta->get_attribute('attr'),
+);
+
+ok(!RoleAttribute->check($_)) for (
+    TestClass->meta->get_attribute('attr'),
+    Moose::Meta::Class->meta->get_attribute('constructor_class'),
+    TestClass->meta,
+);
+
 # Method
 ok(Method->check($_)) for (
     (map { TestClass->meta->get_method($_) } qw(foo bar baz attr)),
