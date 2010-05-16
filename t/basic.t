@@ -7,12 +7,14 @@ use MooseX::Types::Moose qw(Int Str);
 
 use MooseX::Types::Meta ':all';
 
-# TypeConstraint
-ok(TypeConstraint->check($_)) for TypeConstraint, Int;
-ok(!TypeConstraint->check($_)) for \42, 'Moose::Meta::TypeConstraint';
+sub test {
+    my ($name, $code) = @_;
+    subtest $name => sub {
+        $code->();
+        done_testing;
+    };
+}
 
-
-# Class
 {
     package TestClass;
     use Moose;
@@ -44,65 +46,71 @@ ok(!TypeConstraint->check($_)) for \42, 'Moose::Meta::TypeConstraint';
     sub foo { }
 }
 
-ok(Class->check($_)) for (
-    MooseX::Types::Meta->meta,
-    TestClass->meta,
-    Moose::Meta::Class->meta,
-);
+test TypeConstraint => sub {
+    ok(TypeConstraint->check($_)) for TypeConstraint, Int;
+    ok(!TypeConstraint->check($_)) for \42, 'Moose::Meta::TypeConstraint';
+};
 
-ok(!Class->check($_)) for 42, TestRole->meta;
+test Class => sub {
+    ok(Class->check($_)) for (
+        MooseX::Types::Meta->meta,
+        TestClass->meta,
+        Moose::Meta::Class->meta,
+    );
 
+    ok(!Class->check($_)) for 42, TestRole->meta;
+};
 
-# Role
-ok(Role->check($_)) for TestRole->meta;
-ok(!Role->check($_)) for TestClass->meta, 13;
+test Role => sub {
+    ok(Role->check($_)) for TestRole->meta;
+    ok(!Role->check($_)) for TestClass->meta, 13;
+};
 
+test Attribute => sub {
+    ok(Attribute->check($_)) for (
+        TestClass->meta->get_attribute('attr'),
+        Moose::Meta::Class->meta->get_attribute('constructor_class'),
+    );
 
-# Attribute
-ok(Attribute->check($_)) for (
-    TestClass->meta->get_attribute('attr'),
-    Moose::Meta::Class->meta->get_attribute('constructor_class'),
-);
+    ok(!Attribute->check($_)) for (
+        TestRole->meta->get_attribute('attr'),
+        \42,
+    );
+};
 
-ok(!Attribute->check($_)) for (
-    TestRole->meta->get_attribute('attr'),
-    \42,
-);
+test RoleAttribute => sub {
+    ok(RoleAttribute->check($_)) for (
+        TestRole->meta->get_attribute('attr'),
+    );
 
-ok(!Attribute->check($_)) for TestClass->meta, \23;
+    ok(!RoleAttribute->check($_)) for (
+        TestClass->meta->get_attribute('attr'),
+        Moose::Meta::Class->meta->get_attribute('constructor_class'),
+        TestClass->meta,
+    );
+};
 
+test Method => sub {
+    ok(Method->check($_)) for (
+        (map { TestClass->meta->get_method($_) } qw(foo bar baz attr)),
+        (map { TestRole->meta->get_method($_)  } qw(foo attr)),
+        Moose::Meta::Class->meta->get_method('create'),
+        Moose::Meta::Class->meta->get_method('new'),
+    );
 
-# RoleAttribute
-ok(RoleAttribute->check($_)) for (
-    TestRole->meta->get_attribute('attr'),
-);
+    ok(!Method->check($_)) for (
+        TestClass->meta->get_attribute('attr'),
+        TestClass->meta,
+    );
+};
 
-ok(!RoleAttribute->check($_)) for (
-    TestClass->meta->get_attribute('attr'),
-    Moose::Meta::Class->meta->get_attribute('constructor_class'),
-    TestClass->meta,
-);
+test TypeCoercion => sub {
+    my $tc = subtype as Int;
+    coerce $tc, from Str, via { 0 + $_ };
 
-# Method
-ok(Method->check($_)) for (
-    (map { TestClass->meta->get_method($_) } qw(foo bar baz attr)),
-    (map { TestRole->meta->get_method($_)  } qw(foo attr)),
-    Moose::Meta::Class->meta->get_method('create'),
-    Moose::Meta::Class->meta->get_method('new'),
-);
-
-ok(!Method->check($_)) for (
-    TestClass->meta->get_attribute('attr'),
-    TestClass->meta,
-);
-
-
-# TypeCoercion
-my $tc = subtype as Int;
-coerce $tc, from Str, via { 0 + $_ };
-
-ok(TypeCoercion->check($_)) for $tc->coercion;
-ok(!TypeCoercion->check($_)) for $tc, Str, 42;
+    ok(TypeCoercion->check($_)) for $tc->coercion;
+    ok(!TypeCoercion->check($_)) for $tc, Str, 42;
+};
 
 # StructuredTypeConstraint
 # StructuredTypeCoercion
