@@ -3,7 +3,8 @@ use warnings;
 use Test::More;
 
 use Moose::Util::TypeConstraints;
-use MooseX::Types::Moose qw(Int Str);
+use MooseX::Types::Moose ':all';
+use MooseX::Types::Structured ':all';
 
 use MooseX::Types::Meta ':all';
 
@@ -112,7 +113,26 @@ test TypeCoercion => sub {
     ok(!TypeCoercion->check($_)) for $tc, Str, 42;
 };
 
-# StructuredTypeConstraint
+test StructuredTypeConstraint => sub {
+    ok(StructuredTypeConstraint->check($_)) for (
+        Dict,
+        Dict[],
+        Dict[foo => Int],
+        Map,
+        Map[],
+        Map[Int, Str],
+        Tuple,
+        Tuple[],
+        Tuple[Int, Int],
+        (subtype as Dict[]),
+    );
+
+    ok(!StructuredTypeConstraint->check($_)) for (
+        ArrayRef,
+        ArrayRef[Dict[]],
+    );
+};
+
 # StructuredTypeCoercion
 # ParameterizableRole
 # ParameterizedRole

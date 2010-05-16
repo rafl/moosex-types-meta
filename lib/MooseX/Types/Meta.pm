@@ -22,6 +22,8 @@ use MooseX::Types -declare => [qw(
 )];
 use namespace::clean;
 
+# TODO: ParameterizedType{Constraint,Coercion} ?
+
 class_type TypeConstraint, { class => 'Moose::Meta::TypeConstraint'  };
 class_type TypeCoercion,   { class => 'Moose::Meta::TypeCoercion'    };
 class_type Attribute,      { class => 'Class::MOP::Attribute'        };
