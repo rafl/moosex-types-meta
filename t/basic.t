@@ -133,9 +133,44 @@ test StructuredTypeConstraint => sub {
     );
 };
 
+test 'MooseX::Role::Parameterized' => sub {
+    plan skip_all => 'MooseX::Role::Parameterized required'
+        unless eval { require MooseX::Role::Parameterized; 1 };
+
+    eval <<'EOR' or fail;
+package TestRole::Parameterized;
+use MooseX::Role::Parameterized;
+role {
+    sub foo { }
+};
+1;
+EOR
+
+    test ParameterizableRole => sub {
+        ok(ParameterizableRole->check($_)) for (
+            TestRole::Parameterized->meta,
+        );
+
+        ok(!ParameterizableRole->check($_)) for (
+            TestRole->meta,
+        );
+    };
+
+    test ParameterizedRole => sub {
+        ok(ParameterizedRole->check($_)) for (
+            TestRole::Parameterized->meta->generate_role(
+                consumer => Moose::Meta::Class->create_anon_class,
+                parameters => {},
+            ),
+        );
+
+        ok(!ParameterizedRole->check($_)) for (
+            TestRole->meta,
+        );
+    };
+};
+
 # StructuredTypeCoercion
-# ParameterizableRole
-# ParameterizedRole
 
 # TypeEquals
 # TypeOf
