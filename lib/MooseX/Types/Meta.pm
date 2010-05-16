@@ -23,6 +23,7 @@ use MooseX::Types -declare => [qw(
 use namespace::clean;
 
 # TODO: ParameterizedType{Constraint,Coercion} ?
+#       {Duck,Class,Enum,Parameterizable,Parameterized,Role,Union}TypeConstraint?
 
 class_type TypeConstraint, { class => 'Moose::Meta::TypeConstraint'  };
 class_type TypeCoercion,   { class => 'Moose::Meta::TypeCoercion'    };
