@@ -40,12 +40,12 @@ class_type StructuredTypeCoercion, {
     class => 'MooseX::Meta::TypeCoercion::Structured',
 };
 
-role_type ParameterizableRole, {
-    role => 'MooseX::Role::Parameterized::Meta::Role::Parameterizable',
+class_type ParameterizableRole, {
+    class => 'MooseX::Role::Parameterized::Meta::Role::Parameterizable',
 };
 
-role_type ParameterizedRole, {
-    role => 'MooseX::Role::Parameterized::Meta::Role::Parameterized',
+class_type ParameterizedRole, {
+    class => 'MooseX::Role::Parameterized::Meta::Role::Parameterized',
 };
 
 __PACKAGE__->meta->make_immutable;
