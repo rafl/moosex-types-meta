@@ -58,15 +58,15 @@ ok(!Role->check($_)) for TestClass->meta, 13;
 
 
 # Attribute
-{
-    local $TODO = 'figure out if Attribute should handle both metaclass and -role attrs, or if there should be another one for roles';
-    # also don't ever use "ClassAttribute" for anything but MooseX::ClassAttribute stuff
+ok(Attribute->check($_)) for (
+    TestClass->meta->get_attribute('attr'),
+    Moose::Meta::Class->meta->get_attribute('constructor_class'),
+);
 
-    ok(Attribute->check($_)) for (
-        (map { $_->meta->get_attribute('attr') } qw(TestClass TestRole)),
-        Moose::Meta::Class->meta->get_attribute('constructor_class'),
-    );
-}
+ok(!Attribute->check($_)) for (
+    TestRole->meta->get_attribute('attr'),
+    \42,
+);
 
 ok(!Attribute->check($_)) for TestClass->meta, \23;
 
