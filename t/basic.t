@@ -90,6 +90,11 @@ ok(Method->check($_)) for (
     Moose::Meta::Class->meta->get_method('new'),
 );
 
+ok(!Method->check($_)) for (
+    TestClass->meta->get_attribute('attr'),
+    TestClass->meta,
+);
+
 
 # TypeCoercion
 # StructuredTypeConstraint
