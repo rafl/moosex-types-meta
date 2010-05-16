@@ -20,6 +20,7 @@ use MooseX::Types -declare => [qw(
     ParameterizedRole
 
 )];
+use Carp qw(confess);
 use namespace::clean;
 
 # TODO: ParameterizedType{Constraint,Coercion} ?
@@ -48,6 +49,32 @@ class_type ParameterizableRole, {
 class_type ParameterizedRole, {
     class => 'MooseX::Role::Parameterized::Meta::Role::Parameterized',
 };
+
+for my $t (
+    [ 'TypeEquals', 'equals'        ],
+    [ 'TypeOf',     'is_a_type_of'  ],
+    [ 'SubtypeOf',  'is_subtype_of' ],
+) {
+    my ($name, $method) = @{ $t };
+    my $tc = Moose::Meta::TypeConstraint::Parameterizable->new(
+        name                 => join(q{::} => __PACKAGE__, $name),
+        package_defined_in   => __PACKAGE__,
+        parent               => TypeConstraint,
+        constraint_generator => sub {
+            my ($type_parameter) = @_;
+            confess "type parameter $type_parameter for $name is not a type constraint"
+                unless TypeConstraint->check($type_parameter);
+            return sub {
+                my ($val) = @_;
+                return $type_parameter->$method($val);
+            };
+        },
+    );
+
+    Moose::Util::TypeConstraints::register_type_constraint($tc);
+    Moose::Util::TypeConstraints::add_parameterizable_type($tc);
+}
+
 
 __PACKAGE__->meta->make_immutable;
 
