@@ -141,6 +141,21 @@ test StructuredTypeCoercion => sub {
     ok(!StructuredTypeCoercion->check($_)) for $tc, Str, 42;
 };
 
+test TypeEquals => sub {
+    ok((TypeEquals[Num])->check($_)) for Num;
+    ok(!(TypeEquals[Num])->check($_)) for Int, Str;
+};
+
+test SubtypeOf => sub {
+    ok((SubtypeOf[Str])->check($_)) for Num, Int, ClassName, RoleName;
+    ok(!(SubtypeOf[Str])->check($_)) for Str, Value, Ref, Defined, Any, Item;
+};
+
+test TypeOf => sub {
+    ok((TypeOf[Str])->check($_)) for Str, Num, Int, ClassName, RoleName;
+    ok(!(TypeOf[Str])->check($_)) for Value, Ref, Defined, Any, Item;
+};
+
 test 'MooseX::Role::Parameterized' => sub {
     plan skip_all => 'MooseX::Role::Parameterized required'
         unless eval { require MooseX::Role::Parameterized; 1 };
@@ -167,7 +182,7 @@ EOR
     test ParameterizedRole => sub {
         ok(ParameterizedRole->check($_)) for (
             TestRole::Parameterized->meta->generate_role(
-                consumer => Moose::Meta::Class->create_anon_class,
+                consumer   => Moose::Meta::Class->create_anon_class,
                 parameters => {},
             ),
         );
