@@ -66,7 +66,7 @@ for my $t (
                 unless TypeConstraint->check($type_parameter);
             return sub {
                 my ($val) = @_;
-                return $type_parameter->$method($val);
+                return $val->$method($type_parameter);
             };
         },
     );
@@ -74,7 +74,6 @@ for my $t (
     Moose::Util::TypeConstraints::register_type_constraint($tc);
     Moose::Util::TypeConstraints::add_parameterizable_type($tc);
 }
-
 
 __PACKAGE__->meta->make_immutable;
 
