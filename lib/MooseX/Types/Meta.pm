@@ -1,5 +1,6 @@
 package MooseX::Types::Meta;
 
+use Moose 1.05 ();
 use MooseX::Types -declare => [qw(
     TypeConstraint
     TypeCoercion
